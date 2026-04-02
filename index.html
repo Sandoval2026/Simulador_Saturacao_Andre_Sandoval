@@ -11,6 +11,10 @@
   <h3>Veículos</h3>
   <select id="veiculos"></select>
 
+  <p id="ultimaAtualizacao" style="margin-top:20px; font-style:italic; color:gray;">
+    Última atualização: nunca
+  </p>
+
   <!-- PapaParse via CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script>
@@ -21,6 +25,7 @@
       const URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1edVxMUyt2BpVspTPsjjTflJWN81k4IlFemjJDdDPjGY/gviz/tq?tqx=out:csv&gid=1832920211";
       
       const resp = await fetch(URL_PLANILHA);
+
       const csv = await resp.text();
 
       // Parse CSV com PapaParse
