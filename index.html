@@ -25,7 +25,6 @@
       const URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1edVxMUyt2BpVspTPsjjTflJWN81k4IlFemjJDdDPjGY/gviz/tq?tqx=out:csv&gid=1832920211";
       
       const resp = await fetch(URL_PLANILHA);
-
       const csv = await resp.text();
 
       // Parse CSV com PapaParse
