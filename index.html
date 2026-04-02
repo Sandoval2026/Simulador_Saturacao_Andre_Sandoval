@@ -11,10 +11,6 @@
   <h3>Veículos</h3>
   <select id="veiculos"></select>
 
-  <p id="ultimaAtualizacao" style="margin-top:20px; font-style:italic; color:gray;">
-    Última atualização: nunca
-  </p>
-
   <!-- PapaParse via CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script>
@@ -27,7 +23,6 @@
       const resp = await fetch(URL_PLANILHA);
       const csv = await resp.text();
 
-      // Parse CSV com PapaParse
       const resultado = Papa.parse(csv, {
         header: true,
         skipEmptyLines: true
@@ -35,7 +30,6 @@
 
       const dados = resultado.data;
 
-      // Monta os objetos exatamente como no original
       FORNECEDORES = {};
       VEICULOS = [];
 
@@ -52,11 +46,14 @@
         VEICULOS.push(veiculo);
       });
 
+      // Limpar selects antes de repopular
+      const selectFornecedores = document.getElementById("fornecedores");
+      selectFornecedores.innerHTML = "";
+      const selectVeiculos = document.getElementById("veiculos");
+      selectVeiculos.innerHTML = "";
+
       // Ordenar fornecedores
       const fornecedoresOrdenados = Object.keys(FORNECEDORES).sort();
-
-      // Preencher selects
-      const selectFornecedores = document.getElementById("fornecedores");
       fornecedoresOrdenados.forEach(f => {
         const option = document.createElement("option");
         option.value = f;
@@ -64,8 +61,8 @@
         selectFornecedores.appendChild(option);
       });
 
+      // Veículos únicos e ordenados
       const veiculosUnicos = [...new Set(VEICULOS)].sort();
-      const selectVeiculos = document.getElementById("veiculos");
       veiculosUnicos.forEach(v => {
         const option = document.createElement("option");
         option.value = v;
@@ -77,7 +74,11 @@
       console.log("VEICULOS:", VEICULOS);
     }
 
+    // Carregar ao abrir a página
     carregarDados();
+
+    // Atualizar automaticamente de hora em hora (3600000 ms)
+    setInterval(carregarDados, 3600000);
   </script>
 </body>
 </html>
