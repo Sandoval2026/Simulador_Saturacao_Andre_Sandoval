@@ -175,7 +175,7 @@
 
 <script>
 async function carregarDados() {
-  const URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1edVxMUyt2BpVspTPsjjTflJWN81k4IlFemjJDdDPjGY/edit?gid=1832920211#gid=1832920211";
+  const URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1edVxMUyt2BpVspTPsjjTflJWN81k4IlFemjJDdDPjGY/gviz/tq?tqx=out:csv&gid=1832920211";
   const resp = await fetch(URL_PLANILHA);
   const csv = await resp.text();
   // processa CSV e monta os objetos FORNECEDORES e VEICULOS
