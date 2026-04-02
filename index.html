@@ -176,9 +176,30 @@
 <script>
 async function carregarDados() {
   const URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1edVxMUyt2BpVspTPsjjTflJWN81k4IlFemjJDdDPjGY/gviz/tq?tqx=out:csv&gid=1832920211";
+  
   const resp = await fetch(URL_PLANILHA);
   const csv = await resp.text();
-  // processa CSV e monta os objetos FORNECEDORES e VEICULOS
+
+  // Converter CSV em linhas
+  const linhas = csv.split("\n").map(l => l.split(","));
+
+  // Exemplo: supondo que a primeira coluna seja fornecedor e a segunda veículo
+  const FORNECEDORES = {};
+  const VEICULOS = [];
+
+  for (let i = 1; i < linhas.length; i++) { // pula cabeçalho
+    const [fornecedor, veiculo] = linhas[i];
+    if (!fornecedor || !veiculo) continue;
+
+    if (!FORNECEDORES[fornecedor]) {
+      FORNECEDORES[fornecedor] = [];
+    }
+    FORNECEDORES[fornecedor].push(veiculo);
+    VEICULOS.push(veiculo);
+  }
+
+  console.log(FORNECEDORES);
+  console.log(VEICULOS);
 }
   
 // ---- STATE ----
