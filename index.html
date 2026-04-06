@@ -7,53 +7,53 @@
 <body>
   <h3>Fornecedores</h3>
   <select id="fornecedores"></select>
-
   <h3>Veículos</h3>
   <select id="veiculos"></select>
 
-  <!-- PapaParse via CDN -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script>
     let FORNECEDORES = {};
     let VEICULOS = [];
 
+    function formatarFornecedor(cadastro) {
+      // Entrada:  "144871 - BOSCH REXROTH LTDA"
+      // Saída:    "BOSCH REXROTH LTDA - 144871"
+      const partes = cadastro.split(' - ');
+      if (partes.length < 2) return cadastro; // fallback se não tiver " - "
+      const codigo = partes[0].trim();
+      const nome   = partes.slice(1).join(' - ').trim(); // protege nomes com " - " dentro
+      return `${nome} - ${codigo}`;
+    }
+
     async function carregarDados() {
       const URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1edVxMUyt2BpVspTPsjjTflJWN81k4IlFemjJDdDPjGY/gviz/tq?tqx=out:csv&gid=1832920211";
-      
+
       const resp = await fetch(URL_PLANILHA);
-      const csv = await resp.text();
-
-      const resultado = Papa.parse(csv, {
-        header: true,
-        skipEmptyLines: true
-      });
-
+      const csv  = await resp.text();
+      const resultado = Papa.parse(csv, { header: true, skipEmptyLines: true });
       const dados = resultado.data;
 
       FORNECEDORES = {};
-      VEICULOS = [];
+      VEICULOS     = [];
 
       dados.forEach(linha => {
-        const fornecedor = linha["Fornecedor"];
-        const veiculo = linha["Veiculo"];
+        const cadastro = linha["Cadastro"];  // coluna C
+        const veiculo  = linha["Veiculo"];
+        if (!cadastro || !veiculo) return;
 
-        if (!fornecedor || !veiculo) return;
+        const chave = formatarFornecedor(cadastro); // "NOME - CÓDIGO"
 
-        if (!FORNECEDORES[fornecedor]) {
-          FORNECEDORES[fornecedor] = [];
-        }
-        FORNECEDORES[fornecedor].push(veiculo);
+        if (!FORNECEDORES[chave]) FORNECEDORES[chave] = [];
+        FORNECEDORES[chave].push(veiculo);
         VEICULOS.push(veiculo);
       });
 
-      // Limpar selects antes de repopular
+      // Popula select de fornecedores — ordenado alfabeticamente pelo nome
       const selectFornecedores = document.getElementById("fornecedores");
       selectFornecedores.innerHTML = "";
-      const selectVeiculos = document.getElementById("veiculos");
-      selectVeiculos.innerHTML = "";
 
-      // Ordenar fornecedores
-      const fornecedoresOrdenados = Object.keys(FORNECEDORES).sort();
+      const fornecedoresOrdenados = Object.keys(FORNECEDORES).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+
       fornecedoresOrdenados.forEach(f => {
         const option = document.createElement("option");
         option.value = f;
@@ -61,8 +61,11 @@
         selectFornecedores.appendChild(option);
       });
 
-      // Veículos únicos e ordenados
-      const veiculosUnicos = [...new Set(VEICULOS)].sort();
+      // Popula select de veículos — únicos e ordenados
+      const selectVeiculos = document.getElementById("veiculos");
+      selectVeiculos.innerHTML = "";
+
+      const veiculosUnicos = [...new Set(VEICULOS)].sort((a, b) => a.localeCompare(b, 'pt-BR'));
       veiculosUnicos.forEach(v => {
         const option = document.createElement("option");
         option.value = v;
@@ -74,11 +77,8 @@
       console.log("VEICULOS:", VEICULOS);
     }
 
-    // Carregar ao abrir a página
     carregarDados();
-
-    // Atualizar automaticamente a cada 60 segundos
-    setInterval(carregarDados, 60000);
+    setInterval(carregarDados, 3600000);
   </script>
 </body>
 </html>
