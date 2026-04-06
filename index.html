@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Simulador de Saturação — Embalagens v2</title>
+<title>Simulador de SaturaÃ§Ã£o â€” Embalagens v2</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -103,54 +103,54 @@
 <body>
 <header>
   <div class="logo">CNH</div>
-  <h1>Simulador de Saturação de Embalagens</h1>
-  <p>v2.0 — 2026</p>
+  <h1>Simulador de SaturaÃ§Ã£o de Embalagens</h1>
+  <p>v2.0 â€” 2026</p>
 </header>
 
 <div class="layout">
   <!-- LEFT -->
   <div>
     <div class="panel">
-      <div class="pt">Adicionar embalagem à carga</div>
+      <div class="pt">Adicionar embalagem Ã  carga</div>
       <div class="field"><label>Fornecedor</label>
-        <select id="sel-forn" onchange="onFornChange()"><option value="">— Carregando... —</option></select>
-        <div id="loading-msg" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);margin-top:6px;display:none;">⟳ Atualizando dados da planilha...</div>
+        <select id="sel-forn" onchange="onFornChange()"><option value="">â€” Carregando... â€”</option></select>
+        <div id="loading-msg" style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--accent);margin-top:6px;display:none;">âŸ³ Atualizando dados da planilha...</div>
       </div>
       <div class="field"><label>Embalagem</label>
-        <select id="sel-emb"><option value="">— Selecione o fornecedor primeiro —</option></select>
+        <select id="sel-emb"><option value="">â€” Selecione o fornecedor primeiro â€”</option></select>
       </div>
-      <button class="btn ba" onclick="addEmbalagem()">+ Adicionar embalagem à carga</button>
+      <button class="btn ba" onclick="addEmbalagem()">+ Adicionar embalagem Ã  carga</button>
     </div>
 
     <div class="panel">
       <div class="pt">Embalagens da carga</div>
-      <div id="alert-box" class="alert">⚠ Preencha a quantidade em todas as linhas.</div>
+      <div id="alert-box" class="alert">âš  Preencha a quantidade em todas as linhas.</div>
       <table class="et">
-        <thead><tr><th>Código / Fornecedor</th><th>C×L×A (m)</th><th>Qtde</th><th></th></tr></thead>
+        <thead><tr><th>CÃ³digo / Fornecedor</th><th>CÃ—LÃ—A (m)</th><th>Qtde</th><th></th></tr></thead>
         <tbody id="emb-tbody">
           <tr><td colspan="4" style="text-align:center;color:var(--muted);font-size:11px;padding:16px;font-family:'IBM Plex Mono',monospace;">Nenhuma embalagem adicionada</td></tr>
         </tbody>
       </table>
-      <button class="btn bp" onclick="calcular()">▶ Calcular saturação</button>
+      <button class="btn bp" onclick="calcular()">â–¶ Calcular saturaÃ§Ã£o</button>
     </div>
   </div>
 
   <!-- RIGHT -->
   <div class="rp">
-    <div class="es" id="empty-r"><div class="ic">🚛</div>Configure a carga e clique em Calcular</div>
+    <div class="es" id="empty-r"><div class="ic">ðŸš›</div>Configure a carga e clique em Calcular</div>
     <div id="result-c" style="display:none">
       <div class="ebar">
-        <div class="pt" style="margin:0;flex:1">Resultado da simulação</div>
-        <button class="btn be" onclick="window.print()">⬇ Exportar PDF</button>
+        <div class="pt" style="margin:0;flex:1">Resultado da simulaÃ§Ã£o</div>
+        <button class="btn be" onclick="window.print()">â¬‡ Exportar PDF</button>
       </div>
       <div class="sumgrid" id="sumgrid"></div>
       <div class="vc-grid" id="vc-grid"></div>
-      <div class="sep">Detalhamento — <span id="dv-name"></span></div>
+      <div class="sep">Detalhamento â€” <span id="dv-name"></span></div>
       <table class="dt2">
         <thead><tr>
           <th>Embalagem</th><th>Fornecedor</th><th>Dim (m)</th><th>Qtde</th>
-          <th>Lat. máx</th><th>Fil. máx</th><th>Emp. máx</th>
-          <th>Fil. usadas</th><th>Vol. físico</th><th>% veículo</th>
+          <th>Lat. mÃ¡x</th><th>Fil. mÃ¡x</th><th>Emp. mÃ¡x</th>
+          <th>Fil. usadas</th><th>Vol. fÃ­sico</th><th>% veÃ­culo</th>
         </tr></thead>
         <tbody id="dtbody"></tbody>
         <tfoot id="dtfoot"></tfoot>
@@ -163,7 +163,7 @@
 <div class="mo" id="modal">
   <div class="md">
     <h3 id="m-title">Altura da embalagem</h3>
-    <p id="m-desc">Esta embalagem não tem altura cadastrada. Informe a altura real (em metros):</p>
+    <p id="m-desc">Esta embalagem nÃ£o tem altura cadastrada. Informe a altura real (em metros):</p>
     <div class="field"><label>Altura (m)</label>
       <input type="number" id="m-h" min="0.01" step="0.01" placeholder="ex: 0.55" style="font-size:15px;padding:11px;">
     </div>
@@ -176,22 +176,14 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script>
-
-  // ---- CONFIGURAÇÃO DA PLANILHA ----
-const URL_PLANILHA = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTSPsKKjzx69NAjAHNe8WDemI_riLWemDZDO1Pn-q21K27dF-Q7kShLcxLZgxhPpilAlHiYR1ZiUl9y/pub?output=csv";
+// ---- CONFIGURAÃ‡ÃƒO DA PLANILHA ----
+const URL_PLANILHA = "https://docs.google.com/spreadsheets/d/1edVxMUyt2BpVspTPsjjTflJWN81k4IlFemjJDdDPjGY/gviz/tq?tqx=out:csv&gid=1832920211";
 
 // Dados carregados dinamicamente
 let FORNECEDORES = {};
 let VEICULOS = [];
 
-function formatarFornecedor(cadastro) {
-  // "144871 - BOSCH REXROTH LTDA" → "BOSCH REXROTH LTDA - 144871"
-  const partes = cadastro.split(' - ');
-  if (partes.length < 2) return cadastro;
-  const codigo = partes[0].trim();
-  const nome   = partes.slice(1).join(' - ').trim();
-  return `${nome} - ${codigo}`;
-}
+// Chave jÃ¡ vem no formato "NOME - CÃ“DIGO" diretamente do carregarDados()
 
 async function carregarDados() {
   const loadingEl = document.getElementById('loading-msg');
@@ -205,21 +197,31 @@ async function carregarDados() {
     FORNECEDORES = {};
     VEICULOS     = [];
 
+    // Converte nÃºmero brasileiro "1,2" â†’ 1.2
+    function parseBR(val) {
+      if (!val) return 0;
+      return parseFloat(String(val).replace(',', '.')) || 0;
+    }
+
     dados.forEach(linha => {
-      // --- Embalagens (aba Base embalagens) ---
-      const cadastro    = linha["Cadastro"]    || linha["ID parceiro"] || '';
-      const material    = linha["Material"]    || '';
-      const descricao   = linha["Texto breve material"] || linha["Descricao"] || material;
-      const comprimento = parseFloat(linha["Comprimento"]) || 0;
-      const largura     = parseFloat(linha["Largura"])     || 0;
-      const altura      = parseFloat(linha["Altura"])      || 0;
+      // Nomes de colunas reais da planilha:
+      // "CÃ³digo_fornecedor", "Fornecedor", "CÃ³digo_embalagem",
+      // "DescriÃ§Ã£o_embalagem", "Comprimento (m)", "Largura (m)", "Altura (m)"
+      const codForn     = (linha["CÃ³digo_fornecedor"] || '').trim();
+      const nomeForn    = (linha["Fornecedor"]        || '').trim();
+      const material    = (linha["CÃ³digo_embalagem"]  || '').trim();
+      const descricao   = (linha["DescriÃ§Ã£o_embalagem"] || material).trim();
+      const comprimento = parseBR(linha["Comprimento (m)"]);
+      const largura     = parseBR(linha["Largura (m)"]);
+      const altura      = parseBR(linha["Altura (m)"]);
 
-      if (!cadastro || !material || comprimento <= 0) return;
+      if (!codForn || !nomeForn || !material || comprimento <= 0) return;
 
-      const chave = formatarFornecedor(cadastro);
+      // Monta chave no formato "NOME DO FORNECEDOR - CÃ“DIGO"
+      const chave = `${nomeForn} - ${codForn}`;
       if (!FORNECEDORES[chave]) FORNECEDORES[chave] = [];
 
-      // Evita duplicatas de código por fornecedor
+      // Evita duplicatas de cÃ³digo por fornecedor
       const jaExiste = FORNECEDORES[chave].some(e => e.codigo === material);
       if (!jaExiste) {
         FORNECEDORES[chave].push({ codigo: material, descricao, comprimento, largura, altura });
@@ -230,13 +232,13 @@ async function carregarDados() {
     if (loadingEl) loadingEl.style.display = 'none';
   } catch(err) {
     console.error('Erro ao carregar planilha:', err);
-    if (loadingEl) loadingEl.textContent = '⚠ Erro ao carregar dados. Verifique se a planilha está pública.';
+    if (loadingEl) loadingEl.textContent = 'âš  Erro ao carregar dados. Verifique se a planilha estÃ¡ pÃºblica.';
   }
 }
 
 function populaFornecedores() {
   const sf = document.getElementById('sel-forn');
-  sf.innerHTML = '<option value="">— Selecione —</option>';
+  sf.innerHTML = '<option value="">â€” Selecione â€”</option>';
   Object.keys(FORNECEDORES)
     .sort((a, b) => a.localeCompare(b, 'pt-BR'))
     .forEach(f => {
@@ -259,9 +261,9 @@ const sf=document.getElementById('sel-forn');
 function onFornChange(){
   const f=sf.value, se=document.getElementById('sel-emb');
   se.innerHTML='';
-  if(!f){se.innerHTML='<option value="">— Selecione o fornecedor primeiro —</option>';return;}
-  const o0=document.createElement('option');o0.value='';o0.textContent='— Selecione a embalagem —';se.appendChild(o0);
-  (FORNECEDORES[f]||[]).forEach((e,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`${e.codigo} — ${e.descricao}`;se.appendChild(o);});
+  if(!f){se.innerHTML='<option value="">â€” Selecione o fornecedor primeiro â€”</option>';return;}
+  const o0=document.createElement('option');o0.value='';o0.textContent='â€” Selecione a embalagem â€”';se.appendChild(o0);
+  (FORNECEDORES[f]||[]).forEach((e,i)=>{const o=document.createElement('option');o.value=i;o.textContent=`${e.codigo} â€” ${e.descricao}`;se.appendChild(o);});
 }
 
 function addEmbalagem(){
@@ -271,7 +273,7 @@ function addEmbalagem(){
   if(emb.altura===0){
     pending={emb,forn:f};
     document.getElementById('m-title').textContent=`Altura: ${emb.codigo}`;
-    document.getElementById('m-desc').textContent=`"${emb.descricao}" não tem altura cadastrada. Informe a altura real (metros):`;
+    document.getElementById('m-desc').textContent=`"${emb.descricao}" nÃ£o tem altura cadastrada. Informe a altura real (metros):`;
     document.getElementById('m-h').value='';
     document.getElementById('modal').classList.add('open');
     setTimeout(()=>document.getElementById('m-h').focus(),80);
@@ -297,9 +299,9 @@ function render(){
     const e=it.emb, fs=it.forn.split(' - ').slice(1).join(' - ').substring(0,26);
     return `<tr>
       <td><span class="ct">${e.codigo}</span><span class="ft">${fs}</span></td>
-      <td><span class="dt">${e.comprimento}×${e.largura}×${it.h}</span></td>
+      <td><span class="dt">${e.comprimento}Ã—${e.largura}Ã—${it.h}</span></td>
       <td><input type="number" class="iq" min="0" value="${it.qtde||''}" placeholder="0" oninput="items[${i}].qtde=parseInt(this.value)||0"></td>
-      <td><button class="br" onclick="remove(${i})">×</button></td>
+      <td><button class="br" onclick="remove(${i})">Ã—</button></td>
     </tr>`;
   }).join('');
 }
@@ -307,12 +309,12 @@ function render(){
 // ---- CALCULATION (physical layout) ----
 // Saturation = total physical footprint occupied / vehicle volume
 // For each item: how many positions does it need?
-//   lat_max = floor(vL / eL)   — side by side
-//   fil_max = floor(vC / eC)   — rows front to back
-//   emp_max = floor(vH / eH)   — stacking levels
-//   positions = ceil(qtde / (lat_max × emp_max))  — footprints along length
-//   vol_fisico = positions × eC × vL × eH × emp_max  (full width column for each position)
-// But simplified: actual space = ceil(qtde/(lat_max×emp_max)) × eC × (lat_max×eL) × (emp_max×eH)
+//   lat_max = floor(vL / eL)   â€” side by side
+//   fil_max = floor(vC / eC)   â€” rows front to back
+//   emp_max = floor(vH / eH)   â€” stacking levels
+//   positions = ceil(qtde / (lat_max Ã— emp_max))  â€” footprints along length
+//   vol_fisico = positions Ã— eC Ã— vL Ã— eH Ã— emp_max  (full width column for each position)
+// But simplified: actual space = ceil(qtde/(lat_maxÃ—emp_max)) Ã— eC Ã— (lat_maxÃ—eL) Ã— (emp_maxÃ—eH)
 // This reflects the real 3D block consumed, not just individual unit volumes
 
 function calc(it, v){
@@ -322,7 +324,7 @@ function calc(it, v){
   const emp = Math.max(1, Math.floor(v.altura/H));
   // positions along vehicle length needed
   const pos = Math.ceil(Q/(lat*emp));
-  // actual volume block = positions × C × (lat×L) × (emp×H) but cap width to vehicle
+  // actual volume block = positions Ã— C Ã— (latÃ—L) Ã— (empÃ—H) but cap width to vehicle
   const block_w = Math.min(lat*L, v.largura);
   const block_h = Math.min(emp*H, v.altura);
   const vol_f = pos * C * block_w * block_h;
@@ -352,9 +354,9 @@ function renderRes(res,best){
   document.getElementById('result-c').style.display='block';
   const b=best;
   document.getElementById('sumgrid').innerHTML=`
-    <div class="sbox"><div class="sv" style="color:${sc(b.sat)}">${(b.sat*100).toFixed(1)}%</div><div class="sl">Saturação ideal — ${b.v.nome}</div></div>
-    <div class="sbox"><div class="sv">${b.tot.toFixed(2)} m³</div><div class="sl">Vol. físico ocupado</div></div>
-    <div class="sbox"><div class="sv">${b.v.volume} m³</div><div class="sl">Capacidade do veículo</div></div>
+    <div class="sbox"><div class="sv" style="color:${sc(b.sat)}">${(b.sat*100).toFixed(1)}%</div><div class="sl">SaturaÃ§Ã£o ideal â€” ${b.v.nome}</div></div>
+    <div class="sbox"><div class="sv">${b.tot.toFixed(2)} mÂ³</div><div class="sl">Vol. fÃ­sico ocupado</div></div>
+    <div class="sbox"><div class="sv">${b.v.volume} mÂ³</div><div class="sl">Capacidade do veÃ­culo</div></div>
     <div class="sbox"><div class="sv">${items.length}</div><div class="sl">Tipos de embalagem</div></div>`;
 
   document.getElementById('vc-grid').innerHTML=res.map(r=>{
@@ -363,9 +365,9 @@ function renderRes(res,best){
       <div class="vn">${r.v.nome}</div>
       <div class="vbar"><div class="vfill" style="width:${p.toFixed(1)}%;background:${c}"></div></div>
       <div class="vstats">
-        <div class="vs"><div class="vv" style="color:${c}">${(r.sat*100).toFixed(1)}%</div><div class="vl">Saturação</div></div>
-        <div class="vs"><div class="vv">${r.tot.toFixed(1)}</div><div class="vl">M³ usado</div></div>
-        <div class="vs"><div class="vv">${r.v.volume}</div><div class="vl">M³ total</div></div>
+        <div class="vs"><div class="vv" style="color:${c}">${(r.sat*100).toFixed(1)}%</div><div class="vl">SaturaÃ§Ã£o</div></div>
+        <div class="vs"><div class="vv">${r.tot.toFixed(1)}</div><div class="vl">MÂ³ usado</div></div>
+        <div class="vs"><div class="vv">${r.v.volume}</div><div class="vl">MÂ³ total</div></div>
       </div></div>`;
   }).join('');
 
@@ -380,24 +382,24 @@ function selCard(el,nome,idx){
 }
 
 function showDet(r){
-  document.getElementById('dv-name').textContent=`${r.v.nome} — ${r.v.comprimento}×${r.v.largura}×${r.v.altura} m`;
+  document.getElementById('dv-name').textContent=`${r.v.nome} â€” ${r.v.comprimento}Ã—${r.v.largura}Ã—${r.v.altura} m`;
   document.getElementById('dtbody').innerHTML=r.det.map(d=>{
     const fs=d.forn.split(' - ').slice(1).join(' - ').substring(0,20);
     const pct=((d.vol_f/r.v.volume)*100).toFixed(1);
     return `<tr>
       <td><span class="ct">${d.emb.codigo}</span></td>
       <td style="color:var(--muted);font-size:10px">${fs}</td>
-      <td style="font-size:10px">${d.emb.comprimento}×${d.emb.largura}×${d.h}</td>
+      <td style="font-size:10px">${d.emb.comprimento}Ã—${d.emb.largura}Ã—${d.h}</td>
       <td>${d.qtde}</td>
       <td>${d.lat}</td><td>${d.fil}</td><td>${d.emp}</td>
       <td style="color:var(--accent2)">${d.fil_used}</td>
-      <td style="color:var(--accent)">${d.vol_f.toFixed(4)} m³</td>
+      <td style="color:var(--accent)">${d.vol_f.toFixed(4)} mÂ³</td>
       <td style="color:${sc(d.vol_f/r.v.volume)}">${pct}%</td>
     </tr>`;
   }).join('');
   document.getElementById('dtfoot').innerHTML=`<tr>
     <td colspan="8" style="color:var(--muted);font-size:10px">TOTAL</td>
-    <td style="color:var(--accent)">${r.tot.toFixed(3)} m³</td>
+    <td style="color:var(--accent)">${r.tot.toFixed(3)} mÂ³</td>
     <td style="color:${sc(r.sat)};font-size:13px;font-weight:700">${(r.sat*100).toFixed(1)}%</td>
   </tr>`;
 }
