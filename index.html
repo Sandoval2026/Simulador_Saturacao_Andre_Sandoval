@@ -13,16 +13,21 @@ body {
   color: #e5e5e5;
 }
 
-h1, h2, h3 {
+h1, h2 {
   color: #00e5a0;
   margin-bottom: 6px;
 }
 
 .section {
-  margin-top: 18px;
-  border: 1px solid #333;
+  margin-top: 16px;
   padding: 12px;
   background: #151a1f;
+  border: 1px solid #333;
+}
+
+label {
+  display: block;
+  margin-top: 6px;
 }
 
 select, input, button {
@@ -45,8 +50,8 @@ button.primary {
 
 table {
   width: 100%;
-  border-collapse: collapse;
   margin-top: 10px;
+  border-collapse: collapse;
 }
 
 th, td {
@@ -61,12 +66,17 @@ th {
 
 .alert {
   color: #ff6b6b;
-  margin: 8px 0;
+  margin-top: 8px;
 }
 
 @media print {
-  button { display: none; }
-  body { background: #fff; color: #000; }
+  button {
+    display: none;
+  }
+  body {
+    background: #fff;
+    color: #000;
+  }
 }
 </style>
 </head>
@@ -79,11 +89,11 @@ th {
 <div class="section">
   <h2>Adicionar embalagem à carga</h2>
 
-  <label>Fornecedor</label><br>
-  <select id="selectFornecedor" onchange="atualizarEmbalagens()"></select><br>
+  <label for="selectFornecedor">Fornecedor</label>
+  <select id="selectFornecedor"></select>
 
-  <label>Embalagem</label><br>
-  <select id="selectEmbalagem"></select><br>
+  <label for="selectEmbalagem">Embalagem</label>
+  <select id="selectEmbalagem"></select>
 
   <button class="primary" onclick="adicionarEmbalagem()">
     + Adicionar embalagem à carga
@@ -98,8 +108,167 @@ th {
     <thead>
       <tr>
         <th>Código / Fornecedor</th>
-        <th>C × L × A (m)</th>
+        <th>C x L x A (m)</th>
         <th>Qtde</th>
         <th></th>
       </tr>
     </thead>
+    <tbody id="tabelaCarga">
+      <tr>
+        <td colspan="4">Nenhuma embalagem adicionada</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="section">
+  <h2>Calcular saturação</h2>
+
+  <label for="selectVeiculo">Veículo</label>
+  <select id="selectVeiculo"></select>
+
+  <br><br>
+  <button class="primary" onclick="calcularSaturacao()">
+    ▶ Calcular saturação
+  </button>
+</div>
+
+<div class="section">
+  <h2>Resultado da simulação</h2>
+  <div id="resultado">Configure a carga e clique em Calcular.</div>
+</div>
+
+<script>
+/* =====================================================
+   BLOCO DE DADOS — PRODUÇÃO (PT-BR)
+   ===================================================== */
+
+const FORNECEDORES = [
+  { id: 1, nome: "Fornecedor 1" },
+  { id: 2, nome: "Fornecedor 2" },
+  { id: 3, nome: "Fornecedor 3" }
+];
+
+const EMBALAGENS = [
+  { fornecedorId: 1, codigo: "Embal0001", descricao: "BASE NORMAL 1200x800", c: 1.2, l: 0.8, a: 0.15 },
+  { fornecedorId: 1, codigo: "Embal0002", descricao: "LATERAL NORMAL 1200x800", c: 1.2, l: 0.8, a: 0 },
+  { fornecedorId: 2, codigo: "Embal0003", descricao: "CAIXA PLÁSTICA KLT 03", c: 0.6, l: 0.4, a: 0.15 }
+];
+
+const VEICULOS = [
+  { id: 18, nome: "3/4 ABERTO", volume: 23.76 },
+  { id: 35, nome: "3/4 SIDER", volume: 21.12 },
+  { id: 26, nome: "CARRETA ABERTA", volume: 104.00 },
+  { id: 28, nome: "CARRETA SIDER", volume: 87.75 },
+  { id: 16, nome: "DUCATO", volume: 5.32 },
+  { id: 20, nome: "FIORINO", volume: 1.85 },
+  { id: 22, nome: "TOCO ABERTO", volume: 41.76 },
+  { id: 23, nome: "TOCO SIDER", volume: 37.44 },
+  { id: 25, nome: "TRUCK ABERTO", volume: 53.29 },
+  { id: 30, nome: "TRUCK SIDER", volume: 47.78 }
+];
+
+const carga = [];
+
+/* =====================================================
+   INICIALIZAÇÃO — **CRÍTICO PARA GITHUB PAGES**
+   ===================================================== */
+
+document.addEventListener("DOMContentLoaded", iniciar);
+
+function iniciar() {
+  const sf = document.getElementById("selectFornecedor");
+  const sv = document.getElementById("selectVeiculo");
+
+  sf.innerHTML = "";
+  sv.innerHTML = "";
+
+  FORNECEDORES.forEach(f => {
+    sf.innerHTML += `<option value="${f.id}">${f.nome}</option>`;
+  });
+
+  VEICULOS.forEach(v => {
+    sv.innerHTML += `<option value="${v.id}">${v.nome}</option>`;
+  });
+
+  atualizarEmbalagens();
+}
+
+/* =====================================================
+   FUNÇÕES
+   ===================================================== */
+
+function atualizarEmbalagens() {
+  const fornecedorId = Number(document.getElementById("selectFornecedor").value);
+  const se = document.getElementById("selectEmbalagem");
+  se.innerHTML = "";
+
+  EMBALAGENS
+    .filter(e => e.fornecedorId === fornecedorId)
+    .forEach(e => {
+      se.innerHTML += `<option value="${e.codigo}">
+        ${e.codigo} — ${e.descricao}
+      </option>`;
+    });
+}
+
+function adicionarEmbalagem() {
+  const fornecedorId = Number(selectFornecedor.value);
+  const embalagemCodigo = selectEmbalagem.value;
+
+  const embalagem = EMBALAGENS.find(e => e.codigo === embalagemCodigo);
+  const fornecedor = FORNECEDORES.find(f => f.id === fornecedorId);
+
+  carga.push({
+    fornecedor: fornecedor.nome,
+    codigo: embalagem.codigo,
+    c: embalagem.c,
+    l: embalagem.l,
+    a: embalagem.a,
+    qtd: 1
+  });
+
+  renderizarTabela();
+}
+
+function renderizarTabela() {
+  const tb = document.getElementById("tabelaCarga");
+  tb.innerHTML = "";
+
+  if (carga.length === 0) {
+    tb.innerHTML = `<tr><td colspan="4">Nenhuma embalagem adicionada</td></tr>`;
+    return;
+  }
+
+  carga.forEach((i, idx) => {
+    tb.innerHTML += `
+      <tr>
+        <td>${i.codigo} / ${i.fornecedor}</td>
+        <td>${i.c} x ${i.l} x ${i.a}</td>
+        <td>${i.qtd}</td>
+        <td>
+          <button onclick="carga.splice(${idx},1);renderizarTabela()">X</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function calcularSaturacao() {
+  const veiculo = VEICULOS.find(v => v.id === Number(selectVeiculo.value));
+  let volumeTotal = 0;
+
+  carga.forEach(i => {
+    volumeTotal += i.c * i.l * i.a * i.qtd;
+  });
+
+  document.getElementById("resultado").innerHTML =
+    `<strong>Volume físico total:</strong> ${volumeTotal.toFixed(3)} m³<br>
+     <strong>Capacidade do veículo:</strong> ${veiculo.volume} m³<br>
+     <strong>% do veículo:</strong> ${(volumeTotal / veiculo.volume * 100).toFixed(1)} %`;
+}
+</script>
+
+</body>
+</html>
+``
